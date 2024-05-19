@@ -6,11 +6,6 @@ definePageMeta({
 </script>
 
 <template>
-  <div>
-    <p>pos page</p>
-  </div>
 </template>
 
-<style>
-
-</style>
+<style></style>

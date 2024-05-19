@@ -9,4 +9,8 @@ export default defineNuxtConfig({
   },
   eslint: { config: { stylistic: true } },
   css: ["~/assets/globals.css"],
+  app: {
+    pageTransition: { name: "page", mode: "out-in" },
+    layoutTransition: { name: "layout", mode: "out-in" },
+  },
 });
