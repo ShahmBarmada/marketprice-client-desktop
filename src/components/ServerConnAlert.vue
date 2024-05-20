@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 const serverStatus = ref(true);
+const lsu = useLSU();
 const toast = useToast();
 
 setInterval(async () => {
   try {
-    await $fetch(localStorage.getItem("lsu") + "ping", { method: "GET" });
+    await $fetch(lsu + "ping", { method: "GET" });
     serverStatus.value = true;
   } catch {
     serverStatus.value = false;

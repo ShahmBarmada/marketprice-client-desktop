@@ -1,58 +1,61 @@
 <script lang="ts" setup>
 import type { FormSubmitEvent } from "#ui/types";
-import { z } from "zod";
+import * as yup from "yup";
+import { type InferType } from "yup";
 
 definePageMeta({
-  middleware: ['auth']
-})
+  middleware: ["auth"],
+});
 
-interface IloginRes {
+interface ILoginResponse {
   id: number;
   name: string;
   role: string;
   perms?: string;
 }
 
+type Schema = InferType<typeof loginFormSchema>;
+
 const modalOpen = ref(false);
-const serverURL = ref(localStorage.getItem('lsu') || '');
-const loginErr = ref(false)
-
-function resetLoginErr() {
-  loginErr.value = false
-}
-
-const loginData = reactive({
+const serverURL = ref(localStorage.getItem("lsu") || "");
+const loginFormRef = ref();
+const loginFormError = ref("");
+const loginFormLoading = ref(false);
+const loginFormData = reactive({
   userName: undefined,
   userPass: undefined,
 });
+const loginFormSchema = yup.object({
+  userName: yup.string().required("لا يمكن ترك هذا الحقل فارغ"),
+  userPass: yup.string().required("برجاء ادخال كلمة المرور"),
+});
 
 function saveLSU() {
-  localStorage.setItem('lsu', serverURL.value)
+  localStorage.setItem("lsu", serverURL.value);
   modalOpen.value = false;
 }
 
-async function loginSubmit(event: FormSubmitEvent<Schema>) {
+async function loginFormSubmit(event: FormSubmitEvent<Schema>) {
+  loginFormLoading.value = true;
+
   try {
-    const response: IloginRes = await $fetch(serverURL.value + 'login', {
+    const response = await $fetch<ILoginResponse>(serverURL.value + "login", {
       method: "POST",
       body: { name: event.data.userName, pass: event.data.userPass },
     });
-    localStorage.setItem('id', response.id.toString())
-    localStorage.setItem('name', response.name)
-    localStorage.setItem('role', response.role)
-    localStorage.setItem('perms', (response.perms ? JSON.stringify(response.perms) : ''))
-    await navigateTo('/dashboard')
-  } catch {
-    loginErr.value = true
+
+    localStorage.setItem("id", response.id.toString());
+    localStorage.setItem("name", response.name);
+    localStorage.setItem("role", response.role);
+    localStorage.setItem("perms", response.perms ? JSON.stringify(response.perms) : "");
+
+    await navigateTo("/dashboard");
+  } catch (err: any) {
+    loginFormError.value = err.data.message + ", Code: " + JSON.stringify(err.data.status);
   }
+
+  loginFormLoading.value = false;
 }
-
-const loginSchema = z.object({
-  userName: z.string({ required_error: "لا يمكن ترك هذا الحقل فارغ" }),
-  userPass: z.string({ required_error: "برجاء ادخال كلمة المرور" }),
-});
-
-type Schema = z.output<typeof loginSchema>;
 </script>
 
 <template>
@@ -65,23 +68,21 @@ type Schema = z.output<typeof loginSchema>;
         </div>
       </template>
 
-      <UForm :schema="loginSchema" :state="loginData" @submit="loginSubmit" class="space-y-4">
+      <UForm ref="loginFormRef" :schema="loginFormSchema" :state="loginFormData" @submit="loginFormSubmit" class="space-y-4">
         <UFormGroup label="اسم المستخدم" name="userName">
-          <UInput v-model="loginData.userName" color="gray" size="lg" type="text" @change="resetLoginErr" />
+          <UInput v-model="loginFormData.userName" color="gray" size="lg" type="text" autocomplete="off" />
         </UFormGroup>
+
         <UFormGroup label="كلمة المرور" name="userPass">
-          <UInput v-model="loginData.userPass" color="gray" size="lg" type="password" @change="resetLoginErr" />
+          <UInput v-model="loginFormData.userPass" color="gray" size="lg" type="password" autocomplete="off" />
         </UFormGroup>
-        <div class="flex flex-row flex-nowrap justify-end gap-x-4">
-          <p></p>
-          <ULink to="/dashboard">
-            <UButton color="red">لوحة</UButton>
-          </ULink>
-          <UButton type="submit" icon="i-carbon-checkmark-filled" :trailing="true">دخول</UButton>
+        <p v-if="loginFormError" class="text-red-500 text-md text-justify capitalize" dir="ltr">{{ loginFormError }}</p>
+        <div class="flex flex-row flex-nowrap justify-end">
+          <UButton type="submit" :loading="loginFormLoading" icon="i-carbon-checkmark-filled" :trailing="true"
+            >دخول
+          </UButton>
         </div>
       </UForm>
-
-      <p v-if="loginErr" class="text-red-600 mt-4">برجاء التحقق من اسم المستخدم وكلمة المرور</p>
     </UCard>
 
     <UModal v-model="modalOpen">
