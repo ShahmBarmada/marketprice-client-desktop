@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-const user = useUserData();
+const user = useUser();
 
 async function logout() {
   localStorage.removeItem("id");

@@ -1,4 +1,4 @@
-export const useUserData = () => {
+export const useUser = () => {
   let permsValue = localStorage.getItem("perms");
 
   if (permsValue === null) {
