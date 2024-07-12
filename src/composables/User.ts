@@ -1,17 +1,26 @@
 export const useUser = () => {
-  let permsValue = localStorage.getItem("perms");
-
-  if (permsValue === null) {
-    permsValue = '{"all":false}';
+  interface IUser {
+    id: number;
+    name: string;
+    role: string;
   }
 
-  const user = useState("user", () =>
-    reactive({
-      id: localStorage.getItem("id"),
-      name: localStorage.getItem("name"),
-      role: localStorage.getItem("role"),
-      perms: JSON.parse(permsValue),
-    })
-  );
-  return user;
+  const userValue = reactive<IUser | Record<string, never>>({});
+
+  const stored = localStorage.getItem("user");
+
+  if (stored) {
+    const sotredValue: IUser = JSON.parse(stored);
+    Object.assign(userValue, sotredValue);
+  }
+
+  function set(data: IUser | null) {
+    if (data) {
+      localStorage.setItem("user", JSON.stringify(data));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }
+
+  return { user: userValue, set };
 };
