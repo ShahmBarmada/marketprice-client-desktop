@@ -6,18 +6,21 @@ const isDark = computed({
   },
   set() {
     colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-  }
+  },
 })
 </script>
 
 <template>
   <ClientOnly>
-    <UButton :icon="isDark ? 'i-carbon-moon' : 'i-carbon-sun'" color="gray" variant="ghost"
-      aria-label="Theme" @click="isDark = !isDark" />
+    <UButton
+      :icon="isDark ? 'i-carbon-moon' : 'i-carbon-sun'"
+      color="gray"
+      variant="ghost"
+      aria-label="Theme"
+      @click="isDark = !isDark"
+    />
     <template #fallback>
-      <div class="w-8 h-8"></div>
+      <div class="w-8 h-8" />
     </template>
   </ClientOnly>
 </template>
-
-<style></style>

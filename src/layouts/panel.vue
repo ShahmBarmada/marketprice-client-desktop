@@ -2,66 +2,55 @@
 const user = useUser();
 
 async function logout() {
-  localStorage.removeItem("id");
-  localStorage.removeItem("name");
-  localStorage.removeItem("role");
-  localStorage.removeItem("perms");
+  user.set(null);
   navigateTo("/");
 }
 
 const navLinks = [[{ label: "الرئيسية", icon: "i-carbon-collapse-all", to: "/dashboard" }]];
 
-switch (user.value.role) {
+switch (user.user.role) {
   case "كاشير":
     navLinks.push([
-      { label: "كاشير", icon: "i-carbon-purchase", to: "/pos-entry" },
-      { label: "اوردرات", icon: "i-carbon-list-boxes", to: "/pos-oprs" },
+      // { label: "كاشير", icon: "i-carbon-purchase", to: "/" },
+      // { label: "اوردرات", icon: "i-carbon-list-boxes", to: "/" },
     ]);
     break;
   case "مندوب بيع":
     navLinks.push([
-      { label: "اوردر جديد", icon: "i-carbon-new-tab", to: "/sales-entry" },
-      { label: "اوردرات", icon: "i-carbon-list-boxes", to: "/sales-oprs" },
-      { label: "عملاء", icon: "i-carbon-identification", to: "/sales-clients" },
-      { label: "منتجات", icon: "i-carbon-product", to: "/sales-products" },
+      // { label: "اوردر جديد", icon: "i-carbon-new-tab", to: "/" },
+      // { label: "اوردرات", icon: "i-carbon-list-boxes", to: "/" },
+      // { label: "عملاء", icon: "i-carbon-identification", to: "/" },
+      // { label: "منتجات", icon: "i-carbon-product", to: "/" },
     ]);
     break;
   case "مسؤول مخزن":
     navLinks.push([
-      { label: "حركة جديدة", icon: "i-carbon-new-tab", to: "/inv-entry" },
-      { label: "حركة مخزن", icon: "i-carbon-movement", to: "/inv-oprs" },
-      { label: "رصيد مخزن", icon: "i-carbon-store", to: "/inv-products" },
+      // { label: "حركة جديدة", icon: "i-carbon-new-tab", to: "/" },
+      // { label: "حركة مخزن", icon: "i-carbon-movement", to: "/" },
+      // { label: "رصيد مخزن", icon: "i-carbon-store", to: "/" },
     ]);
     break;
   case "إداري":
     navLinks.push([
-      { label: "فواتير", icon: "i-carbon-receipt", to: "/adm-invoices" },
-      { label: "حسابات", icon: "i-carbon-catalog", to: "/adm-accounts" },
-      { label: "موردين", icon: "i-carbon-downstream", to: "/adm-vendors" },
-      { label: "موظفين", icon: "i-carbon-user-data", to: "/adm-employees" },
-      { label: "مناطق خدمة", icon: "i-carbon-location", to: "/adm-areas" },
+      // { label: "فواتير", icon: "i-carbon-receipt", to: "/" },
+      // { label: "حسابات", icon: "i-carbon-catalog", to: "/" },
+      // { label: "موردين", icon: "i-carbon-downstream", to: "/" },
+      // { label: "موظفين", icon: "i-carbon-user-data", to: "/" },
+      // { label: "مناطق خدمة", icon: "i-carbon-location", to: "/" },
     ]);
     break;
   case "مدير":
-    navLinks.push([{ label: "مستخدمين", icon: "i-carbon-user-multiple", to: "/mgr-users" }]);
-    break;
-  case "su":
     navLinks.push([
-      { label: "كاشير", icon: "i-carbon-purchase", to: "/pos-entry" },
-      { label: "اوردرات", icon: "i-carbon-list-boxes", to: "/pos-oprs" },
-      { label: "اوردر جديد", icon: "i-carbon-new-tab", to: "/sales-entry" },
-      { label: "اوردرات", icon: "i-carbon-list-boxes", to: "/sales-oprs" },
-      { label: "عملاء", icon: "i-carbon-identification", to: "/sales-clients" },
-      { label: "منتجات", icon: "i-carbon-product", to: "/sales-products" },
-      { label: "حركة جديدة", icon: "i-carbon-new-tab", to: "/inv-entry" },
-      { label: "حركة مخزن", icon: "i-carbon-movement", to: "/inv-oprs" },
-      { label: "رصيد مخزن", icon: "i-carbon-store", to: "/inv-products" },
-      { label: "فواتير", icon: "i-carbon-receipt", to: "/adm-invoices" },
-      { label: "حسابات", icon: "i-carbon-catalog", to: "/adm-accounts" },
-      { label: "موردين", icon: "i-carbon-downstream", to: "/adm-vendors" },
-      { label: "موظفين", icon: "i-carbon-user-data", to: "/adm-employees" },
-      { label: "مناطق خدمة", icon: "i-carbon-location", to: "/adm-areas" },
-      { label: "مستخدمين", icon: "i-carbon-user-multiple", to: "/mgr-users" },
+      { label: "نقطة بيع", icon: "i-carbon-purchase", to: "/pos" },
+      { label: "اوردرات", icon: "i-carbon-list-boxes", to: "/orders" },
+      { label: "منتجات", icon: "i-carbon-product", to: "/products" },
+      { label: "مخزن", icon: "i-carbon-store", to: "/warehouses" },
+      { label: "عملاء", icon: "i-carbon-identification", to: "/clients" },
+      { label: "موردين", icon: "i-carbon-downstream", to: "/vendors" },
+      { label: "مناطق خدمة", icon: "i-carbon-location", to: "/areas" },
+      { label: "تصنيفات", icon: "i-carbon-location", to: "/categories" },
+      { label: "موظفين", icon: "i-carbon-user-multiple", to: "/users" },
+      { label: "إعدادات", icon: "i-carbon-user-multiple", to: "/configs" },
     ]);
     break;
 }
@@ -76,7 +65,9 @@ switch (user.value.role) {
       <div class="flex flex-col flex-nowrap gap-y-2 px-4">
         <h2 class="text-center text-primary dark:text-primary-600 font-bold text-2xl">سعر السوق</h2>
         <div class="flex flex-row flex-nowrap justify-between items-center">
-          <p class="font-bold text-md">{{ user.name }}</p>
+          <p class="font-semibold text-md">
+            {{ user.user.name }}
+          </p>
           <ColorModeToggle />
         </div>
       </div>
@@ -100,14 +91,13 @@ switch (user.value.role) {
     <div id="content" class="p-4 overflow-auto">
       <slot />
     </div>
-    <ServerConnAlert />
   </div>
 </template>
 
 <style>
 #panel {
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 280px 1fr;
   grid-template-rows: 1fr;
 }
 
