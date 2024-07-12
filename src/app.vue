@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-const appConfig = useAppConfig();
+// const appConfig = useAppConfig()
 
 useHead({
-  htmlAttrs: { lang: "ar", dir: "rtl" },
-});
-
+  htmlAttrs: { lang: 'ar', dir: 'rtl' },
+})
 </script>
 
 <template>

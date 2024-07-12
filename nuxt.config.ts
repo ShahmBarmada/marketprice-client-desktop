@@ -2,15 +2,19 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
-  srcDir: "src",
-  modules: ["@nuxt/eslint", "@nuxt/ui"],
+  srcDir: 'src',
+  modules: ['@nuxt/eslint', '@nuxt/ui', "@nuxt/image"],
   ui: {
-    icons: ["carbon"],
+    icons: ['carbon'],
   },
-  eslint: { config: { stylistic: true } },
-  css: ["~/assets/globals.css"],
+  image: {
+    localServer: {
+      baseURL: "http://localhost:3100/images"
+    }
+  },
+  css: ['~/assets/globals.css'],
   app: {
-    pageTransition: { name: "page", mode: "out-in" },
-    layoutTransition: { name: "layout", mode: "out-in" },
+    pageTransition: { name: 'page', mode: 'out-in' },
+    layoutTransition: { name: 'layout', mode: 'out-in' },
   },
-});
+})
