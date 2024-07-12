@@ -21,6 +21,9 @@
   font-style: oblique -11deg 11deg;
   font-display: swap;
 }
+html {
+  font-size: 1.15em;
+}
 
 body {
   font-family: "NotoKufiArabic", "system-ui", "sans-serif", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
