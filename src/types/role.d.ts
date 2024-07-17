@@ -1,5 +1,5 @@
 declare interface IRole {
-  id: number;
-  label: string;
-  config: string;
+  id: number
+  label: string
+  config: string
 }

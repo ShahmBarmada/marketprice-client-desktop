@@ -1,5 +1,5 @@
 declare interface IState {
-  id: number;
-  label: string;
-  mp: number;
+  id: number
+  label: string
+  mp: number
 }

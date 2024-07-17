@@ -1,5 +1,5 @@
 declare interface IType {
-  id: number;
-  label: string;
-  mp: number;
+  id: number
+  label: string
+  mp: number
 }

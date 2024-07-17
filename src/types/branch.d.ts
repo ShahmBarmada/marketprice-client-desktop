@@ -1,4 +1,4 @@
 declare interface IBranch {
-  id: number;
-  label: string;
+  id: number
+  label: string
 }

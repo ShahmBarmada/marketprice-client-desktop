@@ -1,58 +1,61 @@
 <script lang="ts" setup>
-import * as yup from "yup";
-import type { InferType } from "yup";
-import type { FormSubmitEvent } from "#ui/types";
+import * as yup from 'yup'
+import type { InferType } from 'yup'
+import type { FormSubmitEvent } from '#ui/types'
 
 const props = defineProps<{
-  id: number;
-  label: string;
-  btn: string;
-}>();
-const emit = defineEmits<{ close: [] }>();
+  id: number
+  label: string
+  btn: string
+}>()
+defineEmits<{ close: [] }>()
 
-const api = useAPI();
-const isOpen = ref(false);
-const msgErr = ref("");
-const msgSucc = ref("");
+const api = useAPI()
+const isOpen = ref(false)
+const msgErr = ref('')
+const msgSucc = ref('')
 const initialState = {
   value: undefined,
-};
-const formRef = ref();
+}
+const formRef = ref()
 const formData = reactive({
   ...initialState,
-});
+})
 const formSchema = yup.object({
-  value: yup.string().matches(/^\d+$/, "الباركود يجب ان يتكون من أرقام فقط"),
-});
+  value: yup.string().matches(/^\d+$/, 'الباركود يجب ان يتكون من أرقام فقط'),
+})
 
-type Schema = InferType<typeof formSchema>;
+type Schema = InferType<typeof formSchema>
 
 async function submitForm(event: FormSubmitEvent<Schema>) {
-  msgErr.value = "";
-  msgSucc.value = "";
+  msgErr.value = ''
+  msgSucc.value = ''
 
   const res = await $fetch<any>(`${api.url}/barcodes`, {
-    method: "POST",
+    method: 'POST',
     body: { value: event.data.value, productFK: props.id },
-  }).catch((err) => err.data);
+  }).catch(err => err.data)
   if (res.statusCode) {
-    if (res.message === "barcode") {
-      formRef.value.setErrors([{ message: "هذا الباركود مستخدم من قبل", path: "value" }]);
-    } else {
-      msgErr.value = "حدث خطأ في عملية الإضافة";
+    if (res.message === 'barcode') {
+      formRef.value.setErrors([{ message: 'هذا الباركود مستخدم من قبل', path: 'value' }])
     }
-  } else {
-    resetForm();
-    msgSucc.value = "تم الإضافة بنجاح";
+    else {
+      msgErr.value = 'حدث خطأ في عملية الإضافة'
+    }
+  }
+  else {
+    resetForm()
+    msgSucc.value = 'تم الإضافة بنجاح'
   }
 }
 
 function resetForm() {
-  Object.assign(formData, initialState);
-  msgErr.value = "";
-  msgSucc.value = "";
+  Object.assign(formData, initialState)
+  msgErr.value = ''
+  msgSucc.value = ''
 }
 </script>
+
 <template>
   <div>
     <UModal v-model="isOpen" prevent-close>
@@ -88,20 +91,37 @@ function resetForm() {
             class="flex flex-row flex-nowrap gap-4 items-center"
             @submit="submitForm"
           >
-            <UFormGroup label="الباركود" name="value" required class="grow">
+            <UFormGroup
+              label="الباركود"
+              name="value"
+              required
+              class="grow"
+            >
               <UInput v-model="formData.value" type="text" />
             </UFormGroup>
-            <UButton type="submit">حفظ</UButton>
+            <UButton type="submit">
+              حفظ
+            </UButton>
           </UForm>
         </div>
 
         <template #footer>
-          <UAlert v-if="msgErr.length > 0" color="red" variant="subtle" :ui="{ description: 'text-center' }">
+          <UAlert
+            v-if="msgErr.length > 0"
+            color="red"
+            variant="subtle"
+            :ui="{ description: 'text-center' }"
+          >
             <template #description>
               {{ msgErr }}
             </template>
           </UAlert>
-          <UAlert v-if="msgSucc.length > 0" color="green" variant="subtle" :ui="{ description: 'text-center' }">
+          <UAlert
+            v-if="msgSucc.length > 0"
+            color="green"
+            variant="subtle"
+            :ui="{ description: 'text-center' }"
+          >
             <template #description>
               {{ msgSucc }}
             </template>

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 definePageMeta({
-  layout: "panel",
-});
+  layout: 'panel',
+})
 
 // const user = useUser()
 // const lsu = useLSU()
