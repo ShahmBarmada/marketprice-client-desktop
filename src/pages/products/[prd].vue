@@ -1,44 +1,49 @@
 <script lang="ts" setup>
 definePageMeta({
-  layout: "panel",
-});
+  layout: 'panel',
+})
 
-const api = useAPI();
-const route = useRoute();
+const api = useAPI()
+const route = useRoute()
 
-const { data, refresh } = await useLazyAsyncData<IProduct>("product", () =>
-  $fetch(`${api.url}/products/${route.params.id}`)
-);
+const { data, refresh } = await useLazyAsyncData<IProduct>('product', () =>
+  $fetch(`${api.url}/products/${route.params.prd}`),
+)
 
 async function removeImage(productId: number) {
-  await $fetch(`${api.url}/images/${productId}`, { method: "DELETE" });
-  refresh();
+  await $fetch(`${api.url}/images/${productId}`, { method: 'DELETE' })
+  refresh()
 }
 
 async function updateImage(files: FileList, productId: number) {
   if (files && files.length > 0) {
-    const form = new FormData();
-    form.append("file", files[0]);
-    await $fetch(`${api.url}/images/${productId}`, { method: "PUT", body: form });
-    refresh();
+    const form = new FormData()
+    form.append('file', files[0])
+    await $fetch(`${api.url}/images/${productId}`, { method: 'PUT', body: form })
+    refresh()
   }
 }
 
 async function selectImage() {
-  document.getElementById("imgInput")?.click();
+  document.getElementById('imgInput')?.click()
 }
 
 async function removeBarcode(barcodeId: number) {
-  await $fetch(`${api.url}/barcodes/${barcodeId}`, { method: "DELETE" });
-  refresh();
+  await $fetch(`${api.url}/barcodes/${barcodeId}`, { method: 'DELETE' })
+  refresh()
 }
 </script>
+
 <template>
   <div v-if="data" class="space-y-4">
     <div class="flex justify-between me-10">
-      <p class="text-2xl font-semibold">{{ `المنتجات: ${data.label}` }}</p>
+      <p class="text-2xl font-semibold">
+        {{ `المنتجات: ${data.label}` }}
+      </p>
       <NuxtLink to="/products">
-        <UButton variant="link">عودة لصفحة المنتجات</UButton>
+        <UButton variant="link">
+          عودة
+        </UButton>
       </NuxtLink>
     </div>
     <div id="prdCard">
@@ -50,7 +55,9 @@ async function removeBarcode(barcodeId: number) {
         <p>سعر البيع:</p>
         <p>{{ Number(data.price).toLocaleString("en-us", { minimumFractionDigits: 2 }) }}</p>
         <p>الحالة:</p>
-        <p :class="data.active ? 'text-current' : 'text-red-500'">{{ data.active ? "مفعل" : "غير مفعل" }}</p>
+        <p :class="data.active ? 'text-current' : 'text-red-500'">
+          {{ data.active ? "مفعل" : "غير مفعل" }}
+        </p>
         <p>التصنيف:</p>
         <p>{{ data.category?.label }}</p>
         <p>الوحدة:</p>
@@ -60,11 +67,11 @@ async function removeBarcode(barcodeId: number) {
           {{
             data.createdAt
               ? new Date(data.createdAt).toLocaleString("ar-eg", {
-                  dateStyle: "short",
-                  timeStyle: "short",
-                  hour12: false,
-                  numberingSystem: "latn",
-                })
+                dateStyle: "short",
+                timeStyle: "short",
+                hour12: false,
+                numberingSystem: "latn",
+              })
               : ""
           }}
         </p>
@@ -96,28 +103,41 @@ async function removeBarcode(barcodeId: number) {
       </div>
     </div>
     <div class="flex flex-row justify-around">
-      <!-- <UButton icon="i-carbon-edit">تعديل</UButton> -->
       <ProductsEdit
         :product="{
           id: data.id,
           label: data.label,
           price: data.price,
           active: data.active,
-          categoryFK: data.categoryFK,
-          unitFK: data.unitFK,
+          categoryFK: data.categoryFK!,
+          unitFK: data.unitFK!,
         }"
         :btn-label="`تعديل`"
         @close="refresh"
       />
-      <ProductsBarcode :id="data.id" :label="data.label" :btn="`إضافة باركود`" @close="refresh" />
-      <UButton icon="i-carbon-trash-can" :disabled="data.image ? false : true" @click="removeImage(data.id)"
-        >ازالة الصورة</UButton
-      >
-      <UButton icon="i-carbon-image" @click="selectImage">تحديث الصورة</UButton>
+      <ProductsBarcode
+        :id="data.id"
+        :label="data.label"
+        :btn="`إضافة باركود`"
+        @close="refresh"
+      />
+      <UButton icon="i-carbon-trash-can" :disabled="data.image ? false : true" @click="removeImage(data.id)">
+        ازالة الصورة
+      </UButton>
+      <UButton icon="i-carbon-image" @click="selectImage">
+        تحديث الصورة
+      </UButton>
     </div>
-    <UInput id="imgInput" type="file" accept="image/*" style="display: none" @change="updateImage($event, data.id)" />
+    <UInput
+      id="imgInput"
+      type="file"
+      accept="image/*"
+      style="display: none"
+      @change="updateImage($event, data.id)"
+    />
   </div>
 </template>
+
 <style>
 #prdCard {
   display: grid;
@@ -135,7 +155,7 @@ async function removeBarcode(barcodeId: number) {
   max-width: 1000px;
 }
 
-#prdData > p:nth-child(even) {
+#prdData>p:nth-child(even) {
   font-weight: 600;
 }
 
