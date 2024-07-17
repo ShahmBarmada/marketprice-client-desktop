@@ -30,3 +30,23 @@ body {
     "Noto Color Emoji", sans-serif;
   height: 100vh;
 }
+
+th:first-child,
+td:first-child {
+  width: 2em;
+}
+
+tr.col-1btn > th:last-child,
+tr.col-1btn > td:last-child {
+  width: 1em;
+}
+
+tr.col-2btn > th:last-child,
+tr.col-2btn > td:last-child {
+  width: 1em;
+}
+
+tr.col-3btn > th:last-child,
+tr.col-3btn > td:last-child {
+  width: 1em;
+}
