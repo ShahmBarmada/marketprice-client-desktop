@@ -1,6 +1,5 @@
 declare interface IPartner {
   id: number
-  readonly counter: number
   label: string
   phones: string[]
   email?: string
@@ -8,6 +7,7 @@ declare interface IPartner {
   type: string
   branch?: IBranch
   branchFK: number
+  addresses: IAddress[]
   createdAt: string
   updatedAt?: string
   deletedAt?: string

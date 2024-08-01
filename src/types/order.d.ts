@@ -1,6 +1,5 @@
 declare interface IOrder {
   id: number
-  readonly counter: number
   due?: string
   finished?: string
   notes?: string

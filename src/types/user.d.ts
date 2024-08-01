@@ -2,7 +2,7 @@ declare interface IUser {
   id: number
   label: string
   activated: boolean
-  favs: string[]
+  favs: number[]
   role?: IRole
   roleFK: number
   createdAt: string
