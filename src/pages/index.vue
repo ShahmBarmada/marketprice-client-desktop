@@ -39,9 +39,8 @@ async function loginFormSubmit(event: FormSubmitEvent<Schema>) {
     })
 
     user.set(res)
-    navigateTo('/dashboard')
-  }
-  catch (err: any) {
+    navigateTo('/pos')
+  } catch (err: any) {
     loginFormError.value = err.data.message
   }
 
@@ -65,9 +64,7 @@ function saveAPI() {
             class="absolute"
             @click="modalOpen = true"
           />
-          <h1 class="text-center text-2xl font-bold text-primary">
-            سعر السوق
-          </h1>
+          <h1 class="text-center text-2xl font-bold text-primary">سعر السوق</h1>
         </div>
       </template>
 
@@ -96,7 +93,11 @@ function saveAPI() {
             autocomplete="off"
           />
         </UFormGroup>
-        <p v-if="loginFormError" class="text-red-500 text-md text-justify capitalize" dir="ltr">
+        <p
+          v-if="loginFormError"
+          class="text-red-500 text-md text-justify capitalize"
+          dir="ltr"
+        >
           {{ loginFormError }}
         </p>
         <div class="flex flex-row flex-nowrap justify-end">
@@ -114,7 +115,11 @@ function saveAPI() {
 
     <UModal v-model="modalOpen">
       <div class="flex flex-col flex-nowrap p-4">
-        <UFormGroup label="عنوان الخدام" name="urlInput" :ui="{ container: 'mt-2 flex flex-row flex-nowrap gap-x-4' }">
+        <UFormGroup
+          label="عنوان الخادم"
+          name="urlInput"
+          :ui="{ container: 'mt-2 flex flex-row flex-nowrap gap-x-4' }"
+        >
           <UInput
             v-model="urlInput"
             color="gray"
@@ -123,9 +128,7 @@ function saveAPI() {
             dir="ltr"
             :ui="{ wrapper: 'grow' }"
           />
-          <UButton icon="i-carbon-save" @click="saveAPI">
-            حفظ
-          </UButton>
+          <UButton icon="i-carbon-save" @click="saveAPI"> حفظ </UButton>
         </UFormGroup>
       </div>
     </UModal>

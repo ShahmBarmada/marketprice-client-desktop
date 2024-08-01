@@ -110,7 +110,7 @@ function setImage(files: FileList) {
               variant="solid"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
-              @click="(isOpen = false), resetForm()"
+              @click="(isOpen = false), resetForm(), $emit('close')"
             />
           </div>
         </template>

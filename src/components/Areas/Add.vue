@@ -26,7 +26,7 @@ const formData = reactive({
 })
 
 const formSchema = yup.object({
-  level: yup.number().positive().required('هذا الحقل مطلوب'),
+  level: yup.number().positive('هذا الحقل مطلوب').required('هذا الحقل مطلوب'),
   label: yup.string().required('هذا الحقل مطلوب'),
   parent: yup.number().required(),
   fee: yup.number(),
