@@ -5,10 +5,42 @@ definePageMeta({
 
 const api = useAPI()
 const route = useRoute()
+const page = ref(1)
 
 const { data, refresh } = await useLazyAsyncData<IProduct>('product', () =>
-  $fetch(`${api.url}/products/${route.params.prd}`),
+  $fetch(`${api.url}/products/${route.params.prd}`)
 )
+
+const { data: stocks } = await useLazyAsyncData<IStock[]>(
+  'stocks',
+  () => $fetch(`${api.url}/products/stocks/${route.params.prd}`),
+  { default: () => [] }
+)
+
+const { data: moves } = await useLazyAsyncData<{rows: IMove[], count: {count: number}}>(
+  'moves',
+  () =>
+    $fetch(`${api.url}/products/moves/${route.params.prd}`, {
+      query: { pg: page.value, lmt: 10 },
+    })
+)
+
+const stocksHeaders = [
+  { key: 'branch', label: 'فرع' },
+  { key: 'warehouse', label: 'مخزن' },
+  { key: 'sum', label: 'رصيد' },
+]
+
+const movesHeaders = [
+  { key: 'id', label: '# اوردر' },
+  { key: 'date', label: 'تاريخ' },
+  { key: 'branch', label: 'فرع' },
+  { key: 'warehouse', label: 'مخزن' },
+  { key: 'qty', label: 'كمية' },
+  { key: 'price', label: 'سعر' },
+  { key: 'note', label: 'ملاحظات' },
+  { key: 'type', label: 'عملية' },
+]
 
 async function removeImage(productId: number) {
   await $fetch(`${api.url}/images/${productId}`, { method: 'DELETE' })
@@ -19,7 +51,10 @@ async function updateImage(files: FileList, productId: number) {
   if (files && files.length > 0) {
     const form = new FormData()
     form.append('file', files[0])
-    await $fetch(`${api.url}/images/${productId}`, { method: 'PUT', body: form })
+    await $fetch(`${api.url}/images/${productId}`, {
+      method: 'PUT',
+      body: form,
+    })
     refresh()
   }
 }
@@ -32,6 +67,19 @@ async function removeBarcode(barcodeId: number) {
   await $fetch(`${api.url}/barcodes/${barcodeId}`, { method: 'DELETE' })
   refresh()
 }
+
+function dateFormat(value: string) {
+  if (value) {
+    return new Date(value).toLocaleString('ar-eg', {
+      dateStyle: 'short',
+      timeStyle: 'short',
+      hour12: false,
+      numberingSystem: 'latn',
+    })
+  } else {
+    return ''
+  }
+}
 </script>
 
 <template>
@@ -41,9 +89,7 @@ async function removeBarcode(barcodeId: number) {
         {{ `المنتجات: ${data.label}` }}
       </p>
       <NuxtLink to="/products">
-        <UButton variant="link">
-          عودة
-        </UButton>
+        <UButton variant="link"> عودة </UButton>
       </NuxtLink>
     </div>
     <div id="prdCard">
@@ -53,10 +99,16 @@ async function removeBarcode(barcodeId: number) {
         <p>الاسم:</p>
         <p>{{ data.label }}</p>
         <p>سعر البيع:</p>
-        <p>{{ Number(data.price).toLocaleString("en-us", { minimumFractionDigits: 2 }) }}</p>
+        <p>
+          {{
+            Number(data.price).toLocaleString('en-us', {
+              minimumFractionDigits: 2,
+            })
+          }}
+        </p>
         <p>الحالة:</p>
         <p :class="data.active ? 'text-current' : 'text-red-500'">
-          {{ data.active ? "مفعل" : "غير مفعل" }}
+          {{ data.active ? 'مفعل' : 'غير مفعل' }}
         </p>
         <p>التصنيف:</p>
         <p>{{ data.category?.label }}</p>
@@ -66,19 +118,21 @@ async function removeBarcode(barcodeId: number) {
         <p class="col-span-2">
           {{
             data.createdAt
-              ? new Date(data.createdAt).toLocaleString("ar-eg", {
-                dateStyle: "short",
-                timeStyle: "short",
-                hour12: false,
-                numberingSystem: "latn",
-              })
-              : ""
+              ? new Date(data.createdAt).toLocaleString('ar-eg', {
+                  dateStyle: 'short',
+                  timeStyle: 'short',
+                  hour12: false,
+                  numberingSystem: 'latn',
+                })
+              : ''
           }}
         </p>
         <span />
         <span class="hidden min-[1200px]:col-span-2 min-[1200px]:block" />
         <p>باركود:</p>
-        <div class="flex flex-row flex-wrap gap-2 max-w-[875px] col-span-3 min-[1200px]:col-span-5">
+        <div
+          class="flex flex-row flex-wrap gap-2 max-w-[875px] col-span-3 min-[1200px]:col-span-5"
+        >
           <UButtonGroup
             v-for="item in data.barcodes"
             :key="item.id"
@@ -87,7 +141,11 @@ async function removeBarcode(barcodeId: number) {
             class="mx-2 bg-gray-200"
           >
             <span class="px-2 pt-1">{{ item.value }}</span>
-            <UButton icon="i-heroicons-x-mark-16-solid" color="red" @click="removeBarcode(item.id)" />
+            <UButton
+              icon="i-heroicons-x-mark-16-solid"
+              color="red"
+              @click="removeBarcode(item.id)"
+            />
           </UButtonGroup>
         </div>
       </div>
@@ -121,13 +179,50 @@ async function removeBarcode(barcodeId: number) {
         :btn="`إضافة باركود`"
         @close="refresh"
       />
-      <UButton icon="i-carbon-trash-can" :disabled="data.image ? false : true" @click="removeImage(data.id)">
+      <UButton
+        icon="i-carbon-trash-can"
+        :disabled="data.image ? false : true"
+        @click="removeImage(data.id)"
+      >
         ازالة الصورة
       </UButton>
       <UButton icon="i-carbon-image" @click="selectImage">
         تحديث الصورة
       </UButton>
     </div>
+
+    <div>
+      <p class="text-xl font-semibold">رصيد الكمية</p>
+      <UTable :columns="stocksHeaders" :rows="stocks">
+        <template #sum-data="{row}">
+          {{ parseFloat(row.sum).toFixed(2) }}
+        </template>
+      </UTable>
+    </div>
+
+    <div v-if="moves">
+      <p class="text-xl font-semibold">حركة المنتج</p>
+      <UTable :columns="movesHeaders" :rows="moves.rows">
+        <template #date-data="{ row }">
+          {{ dateFormat(row.date) }}
+        </template>
+        <template #qty-data="{ row }">
+          {{ parseFloat(row.qty).toFixed(2) }}
+        </template>
+        <template #price-data="{ row }">
+          {{ parseFloat(row.price).toFixed(2) }}
+        </template>
+      </UTable>
+      <div class="flex justify-center mt-auto">
+        <UPagination
+          v-model="page"
+          :page-count="10"
+          :total="moves.count.count"
+          :max="5"
+        />
+      </div>
+    </div>
+
     <UInput
       id="imgInput"
       type="file"
@@ -155,7 +250,7 @@ async function removeBarcode(barcodeId: number) {
   max-width: 1000px;
 }
 
-#prdData>p:nth-child(even) {
+#prdData > p:nth-child(even) {
   font-weight: 600;
 }
 
@@ -167,7 +262,7 @@ async function removeBarcode(barcodeId: number) {
 
 .prdLogo {
   background-color: currentColor;
-  mask: url("/product.svg") no-repeat center / contain;
+  mask: url('/product.svg') no-repeat center / contain;
   width: 250px;
   height: 250px;
 }

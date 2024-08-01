@@ -107,7 +107,7 @@ const tableHeaders = [
       </template>
       <template #actions-data="{ row }">
         <UTooltip text="تعديل">
-          <AreasEdit :id="row.id" @close="refresh" />
+          <AreasEdit :area="row.id" @close="refresh" />
         </UTooltip>
         <UTooltip v-if="!row.deletedAt" text="حذف">
           <UButton

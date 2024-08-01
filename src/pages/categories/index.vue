@@ -8,9 +8,13 @@ const {
   data: categories,
   status,
   refresh,
-} = await useLazyAsyncData<ICategory[]>('categories', () => $fetch(`${api.url}/categories/admin`), {
-  default: () => [],
-})
+} = await useLazyAsyncData<ICategory[]>(
+  'categories',
+  () => $fetch(`${api.url}/categories/admin`),
+  {
+    default: () => [],
+  }
+)
 
 async function deleteCategory(id: number) {
   await $fetch(`${api.url}/categories/${id}`, { method: 'DELETE' })
@@ -33,23 +37,29 @@ const tableHeaders = [
 <template>
   <div v-if="categories" class="space-y-4">
     <div class="flex justify-between me-10">
-      <p class="text-2xl font-semibold">
-        التصنيفات الرئيسية
-      </p>
+      <p class="text-2xl font-semibold">التصنيفات الرئيسية</p>
       <CategoriesAdd :level="1" @close="refresh" />
     </div>
     <UTable
       :columns="tableHeaders"
       :rows="categories.filter((item) => item.level === 1)"
       :loading="status === 'pending'"
-      :empty-state="{ icon: 'i-heroicons-circle-stack-20-solid', label: 'لا يوجد نتائج' }"
-      :ui="{ td: { padding: 'py-1' }, th: { padding: 'py-2' }, tr: { base: 'col-2btn' } }"
+      :empty-state="{
+        icon: 'i-heroicons-circle-stack-20-solid',
+        label: 'لا يوجد نتائج',
+      }"
+      :ui="{
+        td: { padding: 'py-1' },
+        th: { padding: 'py-2' },
+        tr: { base: 'col-2btn' },
+      }"
     >
       <template #label-data="{ row }">
         <NuxtLink
           :to="{ name: 'categories-ctg', params: { ctg: row.id } }"
           class="font-semibold hover:text-primary hover:underline"
-        >{{ row.label }}</NuxtLink>
+          >{{ row.label }}</NuxtLink
+        >
       </template>
       <template #deletedAt-data="{ row }">
         <span v-if="row.deletedAt" class="text-red-500">معطل</span>
@@ -57,7 +67,7 @@ const tableHeaders = [
       </template>
       <template #actions-data="{ row }">
         <UTooltip text="تعديل">
-          <CategoriesEdit :id="row.id" @close="refresh" />
+          <CategoriesEdit :ctg="row.id" :label="row.label" @close="refresh" />
         </UTooltip>
         <UTooltip v-if="!row.deletedAt" text="حذف">
           <UButton

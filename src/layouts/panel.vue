@@ -1,57 +1,66 @@
 <script lang="ts" setup>
 const user = useUser()
+const branch = useBranch()
+const wh = useWH()
 
 async function logout() {
   user.set(null)
   navigateTo('/')
 }
 
-const navLinks = [[{ label: 'الرئيسية', icon: 'i-carbon-collapse-all', to: '/dashboard' }]]
+const navLinks: { label: string; icon: string; to: string }[][] = []
 
 switch (user.user.role) {
   case 'كاشير':
     navLinks.push([
-      // { label: "كاشير", icon: "i-carbon-purchase", to: "/" },
-      // { label: "اوردرات", icon: "i-carbon-list-boxes", to: "/" },
+      { label: 'نقطة بيع', icon: 'i-carbon-purchase', to: '/pos' },
+      { label: 'فواتير معلقة', icon: 'i-carbon-purchase', to: '/pos/drafts' },
     ])
     break
   case 'مندوب بيع':
     navLinks.push([
-      // { label: "اوردر جديد", icon: "i-carbon-new-tab", to: "/" },
-      // { label: "اوردرات", icon: "i-carbon-list-boxes", to: "/" },
-      // { label: "عملاء", icon: "i-carbon-identification", to: "/" },
-      // { label: "منتجات", icon: "i-carbon-product", to: "/" },
+      { label: 'مبيعات', icon: 'i-carbon-list-boxes', to: '/sales' },
+      { label: 'عملاء', icon: 'i-carbon-identification', to: '/clients' },
     ])
     break
   case 'مسؤول مخزن':
     navLinks.push([
-      // { label: "حركة جديدة", icon: "i-carbon-new-tab", to: "/" },
-      // { label: "حركة مخزن", icon: "i-carbon-movement", to: "/" },
-      // { label: "رصيد مخزن", icon: "i-carbon-store", to: "/" },
+      { label: 'مشتريات', icon: 'i-carbon-list-boxes', to: '/purchase' },
+      { label: 'مناقلات', icon: 'i-carbon-store', to: '/transactions' },
     ])
     break
   case 'إداري':
-    navLinks.push([
-      // { label: "فواتير", icon: "i-carbon-receipt", to: "/" },
-      // { label: "حسابات", icon: "i-carbon-catalog", to: "/" },
-      // { label: "موردين", icon: "i-carbon-downstream", to: "/" },
-      // { label: "موظفين", icon: "i-carbon-user-data", to: "/" },
-      // { label: "مناطق خدمة", icon: "i-carbon-location", to: "/" },
-    ])
-    break
-  case 'مدير':
-    navLinks[0].push(
-      { label: 'نقطة بيع', icon: 'i-carbon-purchase', to: '/pos' },
-      { label: 'فواتير معلقة', icon: 'i-carbon-purchase', to: '/pos/drafts' },
-    )
     navLinks.push(
       [
-        { label: 'مبيعات', icon: 'i-carbon-list-boxes', to: '/purchase' },
-        { label: 'مشتريات', icon: 'i-carbon-list-boxes', to: '/sales' },
-        { label: 'عمليات مخزن', icon: 'i-carbon-store', to: '/transactions' },
+        { label: 'نقطة بيع', icon: 'i-carbon-purchase', to: '/pos' },
+        { label: 'فواتير معلقة', icon: 'i-carbon-purchase', to: '/pos/drafts' },
+      ],
+      [
+        { label: 'مبيعات', icon: 'i-carbon-list-boxes', to: '/sales' },
+        { label: 'مشتريات', icon: 'i-carbon-list-boxes', to: '/purchase' },
+        { label: 'مناقلات', icon: 'i-carbon-store', to: '/transactions' },
       ],
       [
         { label: 'منتجات', icon: 'i-carbon-product', to: '/products' },
+        { label: 'عملاء', icon: 'i-carbon-identification', to: '/clients' },
+        { label: 'موردين', icon: 'i-carbon-downstream', to: '/vendors' },
+      ]
+    )
+    break
+  case 'مدير':
+    navLinks.push(
+      [
+        { label: 'نقطة بيع', icon: 'i-carbon-purchase', to: '/pos' },
+        { label: 'فواتير معلقة', icon: 'i-carbon-purchase', to: '/pos/drafts' },
+      ],
+      [
+        { label: 'مبيعات', icon: 'i-carbon-list-boxes', to: '/sales' },
+        { label: 'مشتريات', icon: 'i-carbon-list-boxes', to: '/purchase' },
+        { label: 'مناقلات', icon: 'i-carbon-store', to: '/transactions' },
+      ],
+      [
+        { label: 'منتجات', icon: 'i-carbon-product', to: '/products' },
+        { label: 'كميات', icon: 'i-carbon-product', to: '/stocks' },
         { label: 'عملاء', icon: 'i-carbon-identification', to: '/clients' },
         { label: 'موردين', icon: 'i-carbon-downstream', to: '/vendors' },
       ],
@@ -60,7 +69,7 @@ switch (user.user.role) {
         { label: 'تصنيفات', icon: 'i-carbon-group-objects', to: '/categories' },
         { label: 'موظفين', icon: 'i-carbon-user-multiple', to: '/users' },
         { label: 'إعدادات', icon: 'i-carbon-settings', to: '/configs' },
-      ],
+      ]
     )
     break
 }
@@ -73,7 +82,9 @@ switch (user.user.role) {
       class="overflow-auto flex flex-col flex-nowrap gap-y-4 py-4 border-e border-e-solid border-e-gray-400 dark:border-e-gray-200"
     >
       <div class="flex flex-col flex-nowrap gap-y-2 px-4">
-        <h2 class="text-center text-primary dark:text-primary-600 font-bold text-2xl">
+        <h2
+          class="text-center text-primary dark:text-primary-600 font-bold text-2xl"
+        >
           سعر السوق
         </h2>
         <div class="flex flex-row flex-nowrap justify-between items-center">
@@ -82,6 +93,7 @@ switch (user.user.role) {
           </p>
           <ColorModeToggle />
         </div>
+        <p>{{ `${branch.branch.label} - ${wh.wh.label}` }}</p>
       </div>
 
       <UVerticalNavigation
@@ -89,16 +101,20 @@ switch (user.user.role) {
         :ui="{
           size: 'text-md',
           label: 'ps-2',
-          active: 'text-white dark:text-white before:bg-primary dark:before:bg-primary-600',
-          icon: { active: 'text-white', inactive: 'text-gray-500 dark:text-gray-400' },
+          active:
+            'text-white dark:text-white before:bg-primary dark:before:bg-primary-600',
+          icon: {
+            active: 'text-white',
+            inactive: 'text-gray-500 dark:text-gray-400',
+          },
         }"
         class="shrink-0 grow-0 px-2"
       />
 
-      <div class="mt-auto px-2 flex flex-row flex-nowrap justify-between items-center">
-        <UButton variant="ghost" @click.prevent="logout">
-          خروج
-        </UButton>
+      <div
+        class="mt-auto px-2 flex flex-row flex-nowrap justify-between items-center"
+      >
+        <UButton variant="ghost" @click.prevent="logout"> خروج </UButton>
       </div>
     </div>
 
@@ -115,7 +131,7 @@ switch (user.user.role) {
   grid-template-rows: 1fr;
 }
 
-#nave {
+#nav {
   grid-column: 1 / 2;
 }
 

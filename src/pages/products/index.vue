@@ -5,21 +5,29 @@ definePageMeta({
 
 const api = useAPI()
 const search = ref()
-const unitFilter = ref(null)
-const categoryFilter = ref(null)
-const activeFilter = ref(null)
+const unitFilter = ref()
+const categoryFilter = ref()
+const activeFilter = ref()
 const page = ref(1)
 
-const { data: units } = await useAsyncData<IUnit[]>('units', () => $fetch(`${api.url}/units`), { default: () => [] })
-const { data: categories } = await useAsyncData<ICategory[]>('categories', () => $fetch(`${api.url}/categories`), {
-  default: () => [],
-})
+const { data: units } = await useAsyncData<IUnit[]>(
+  'units',
+  () => $fetch(`${api.url}/units`),
+  { default: () => [] }
+)
+const { data: categories } = await useAsyncData<ICategory[]>(
+  'categories',
+  () => $fetch(`${api.url}/categories`),
+  {
+    default: () => [],
+  }
+)
 
 const {
   data: products,
   status,
   refresh,
-} = await useLazyAsyncData<{ rows: IProduct[], count: number }>(
+} = await useLazyAsyncData<{ rows: IProduct[]; count: number }>(
   'prodcuts',
   () =>
     $fetch(`${api.url}/products/filter`, {
@@ -32,7 +40,10 @@ const {
         ctgy: categoryFilter.value,
       },
     }),
-  { default: () => ({ rows: [], count: 0 }), watch: [search, page, unitFilter, categoryFilter, activeFilter] },
+  {
+    default: () => ({ rows: [], count: 0 }),
+    watch: [search, page, unitFilter, categoryFilter, activeFilter],
+  }
 )
 
 const tableHeaders = [
@@ -51,16 +62,17 @@ const activeOptions = [
 ]
 
 async function handleChange(id: number, value: boolean) {
-  await $fetch(`${api.url}/products/${id}`, { method: 'PUT', body: { active: value } })
+  await $fetch(`${api.url}/products/${id}`, {
+    method: 'PUT',
+    body: { active: value },
+  })
 }
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div v-if="products" class="flex flex-col flex-nowrap h-full gap-y-4">
     <div class="flex justify-between me-10">
-      <p class="text-2xl font-semibold">
-        المنتجات
-      </p>
+      <p class="text-2xl font-semibold">المنتجات</p>
       <ProductsAdd @close="refresh" />
     </div>
 
@@ -114,29 +126,56 @@ async function handleChange(id: number, value: boolean) {
           size="xs"
           icon="i-carbon-reset"
           class="mt-auto"
-          @click="(activeFilter = null), (unitFilter = null), (categoryFilter = null), refresh()"
+          @click="
+            ;(activeFilter = null),
+              (unitFilter = null),
+              (categoryFilter = null),
+              refresh()
+          "
         />
       </div>
     </div>
 
     <UTable
       :columns="tableHeaders"
-      :rows="products.rows.map((item) => ({ ...item, unitLbl: item.unit?.label, categoryLbl: item.category?.label }))"
+      :rows="
+        products.rows.map((item) => ({
+          ...item,
+          unitLbl: item.unit?.label,
+          categoryLbl: item.category?.label,
+        }))
+      "
       :loading="status === 'pending'"
-      :empty-state="{ icon: 'i-heroicons-circle-stack-20-solid', label: 'لا يوجد نتائج' }"
-      :ui="{ td: { padding: 'py-1' }, th: { padding: 'py-2' }, tr: { base: 'col-1btn' } }"
+      :empty-state="{
+        icon: 'i-heroicons-circle-stack-20-solid',
+        label: 'لا يوجد نتائج',
+      }"
+      :ui="{
+        td: { padding: 'py-1' },
+        th: { padding: 'py-2' },
+        tr: { base: 'col-1btn' },
+      }"
     >
       <template #label-data="{ row }">
         <NuxtLink
           :to="{ name: 'products-prd', params: { prd: row.id } }"
           class="font-semibold hover:text-primary hover:underline"
-        >{{ row.label }}</NuxtLink>
+        >
+          {{ row.label }}
+        </NuxtLink>
       </template>
       <template #price-data="{ row }">
-        {{ parseFloat(row.price).toLocaleString("en", { minimumFractionDigits: 2 }) }}
+        {{
+          parseFloat(row.price).toLocaleString('en', {
+            minimumFractionDigits: 2,
+          })
+        }}
       </template>
       <template #active-data="{ row }">
-        <UCheckbox v-model="row.active" @change="handleChange(row.id, row.active)" />
+        <UCheckbox
+          v-model="row.active"
+          @change="handleChange(row.id, row.active)"
+        />
       </template>
       <template #actions-data="{ row }">
         <UTooltip text="تعديل">
@@ -155,7 +194,7 @@ async function handleChange(id: number, value: boolean) {
       </template>
     </UTable>
 
-    <div class="flex justify-center">
+    <div class="flex justify-center mt-auto">
       <UPagination
         v-model="page"
         :page-count="15"
